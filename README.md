@@ -20,4 +20,9 @@ Run:
 ```bash
 cd builddir && ./shuffle ../test.ascii 10 "50;255;50"
 ```
+
+Install (when in builddir):
+```bash
+sudo meson install
+```
 <img src="shuffle.gif" alt="shuffle.gif"></img>

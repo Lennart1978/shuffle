@@ -26,3 +26,4 @@ Install (when in builddir):
 sudo meson install
 ```
 <img src="shuffle.gif" alt="shuffle.gif"></img>
+<img src="bytheway.gif" alt="bytheway.gif"></img>

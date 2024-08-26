@@ -5,7 +5,9 @@
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
+
+// The last bit as flag
+#define IS_END_FLAG 0x01
 
 // Hide the cursor
 #define INVISIBLE "\033[?25l"

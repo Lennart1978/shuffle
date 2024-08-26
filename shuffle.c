@@ -20,7 +20,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     req.tv_nsec = speed * 10000;
     req.tv_sec = 0;
     int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels;
-    bool is_end = false;
+    int flag = 0;
 
     row = col = 0;
 
@@ -111,8 +111,12 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
             fflush(stdout);
         }
 
-        // Show the ASCII art for 2 seconds at first glance
-        !is_end ? (sleep(2), is_end = true) : 0;
+        // Show the ASCII art for 2 seconds at first glance (with bit flag)
+        if (!(flag & IS_END_FLAG))
+        {
+            sleep(2);
+            flag |= IS_END_FLAG;
+        }
 
         // Shuffle the array again for deletion effect
         shuffle(shuffle_array, total_pixels);

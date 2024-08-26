@@ -22,8 +22,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels;
     bool is_end = false;
 
-    row = 0;
-    col = 0;
+    row = col = 0;
 
     // count rows and columns
     for (int i = 0; i < (int)strlen(ansi_pic); i++)
@@ -47,8 +46,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
      * we can declare the perfect buffer now: */
     char pic_array[height][width];
 
-    row = 0;
-    col = 0;
+    row = col = 0;
 
     // Store the ASCII picture in 2D array
     for (int i = 0; i < total_pixels; i++)

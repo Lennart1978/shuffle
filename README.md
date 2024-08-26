@@ -25,5 +25,7 @@ Install (when in builddir):
 ```bash
 sudo meson install
 ```
+For Archlinux users: It is in the AUR now 'shuffle-ascii'.
+
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>

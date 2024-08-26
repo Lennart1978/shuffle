@@ -13,7 +13,7 @@ Example: shuffle file.ascii 10 "50;255;50" - prints "file.ascii" in bright green
 
 Build:
 ```bash
-mkdir builddir && meson setup builddir --buildtype=release --prefix=/usr/bin && meson compile -C builddir
+mkdir builddir && meson setup builddir --buildtype=release --prefix=/usr && meson compile -C builddir
 ```
 
 Run:

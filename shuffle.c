@@ -25,7 +25,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     row = col = 0;
 
     // count rows and columns
-    for (int i = 0; i < (int)strlen(ansi_pic); i++)
+    for (int i = 0; i < (int)strlen(ansi_pic); i++, col++)
     {
         if (ansi_pic[i] == '\n')
         {
@@ -34,7 +34,6 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
             width = (col > width) ? col : width;
             col = 0;
         }
-        col++;
     }
 
     height = row;
@@ -49,14 +48,9 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     row = col = 0;
 
     // Store the ASCII picture in 2D array
-    for (int i = 0; i < total_pixels; i++)
+    for (int i = 0; i < total_pixels; pic_array[row][col++] = ansi_pic[i++])
     {
-        if (ansi_pic[i] == '\n')
-        {
-            row++;
-            col = 0;
-        }
-        pic_array[row][col++] = ansi_pic[i];
+        ansi_pic[i] == '\n' ? row++, col = 0 : 0;
     }
 
     // Delete screen and go to position 1, 1
@@ -65,10 +59,8 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     int shuffle_array[total_pixels];
 
     // Fill the shuffle array with ascending numbers.
-    for (int i = 0; i < total_pixels; i++)
-    {
-        shuffle_array[i] = i;
-    }
+    for (int i = 0; i < total_pixels; shuffle_array[i] = i++)
+        ;
 
     // Shuffle all the numbers in the array
     shuffle(shuffle_array, total_pixels);
@@ -112,20 +104,17 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
         }
 
         // Show the ASCII art for 2 seconds at first glance (with bit flag)
-        if (!(flag & IS_END_FLAG))
-        {
-            sleep(2);
-            flag |= IS_END_FLAG;
-        }
+        !(flag & IS_END_FLAG) ? sleep(2), flag |= IS_END_FLAG : 0;
 
         // Shuffle the array again for deletion effect
         shuffle(shuffle_array, total_pixels);
 
         // Delete the 2D array (Fill with blank spaces)
+
         for (int r = 0; r < height; r++)
         {
-            for (int q = 0; q < width; q++)
-                pic_array[r][q] = ' ';
+            for (int q = 0; q < width; pic_array[r][q++] = ' ')
+                ;
         }
     }
 
@@ -164,6 +153,7 @@ int load_ascii(const char *filename)
     if (!ascii_pic)
     {
         fprintf(stderr, "Can't allocate memory for 'ansi_pic'");
+        file ? fclose(file) : 0;
         return 1;
     }
 
@@ -176,6 +166,9 @@ int load_ascii(const char *filename)
 
     // NULL termination
     *temp = '\0';
+
+    // Close the file
+    fclose(file);
 
     return 0;
 }

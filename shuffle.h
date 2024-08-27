@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define VERSION "1.0.1"
+
 // The last bit as flag
 #define IS_END_FLAG 0x01
 

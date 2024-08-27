@@ -6,7 +6,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
+
+// Nanoseconds multiplied with speed
+#define NSECONDS 10000
 
 // The last bit as flag
 #define IS_END_FLAG 0x01

@@ -7,7 +7,8 @@ shuffle ascii_picture speed "color"
 
 speed: 1 is fast and >500 very slow, -1 = immediately.
 
-color: Must be in quotation marks of format: "r;g;b" or just "random".
+color: Must be in quotation marks of format: "r;g;b"
+or one of the standard colors "red, green, yellow, blue, magenta, cyan, orange, white, grey" or just "random".
 
 Example: shuffle file.ascii 10 "50;255;50" - prints "file.ascii" in bright green.
 

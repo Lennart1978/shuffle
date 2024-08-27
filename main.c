@@ -5,7 +5,8 @@ const char *help = "------------------------------------------------------------
                    "---------------------------------v"VERSION"-------------------------------\n\033[1m"
                    "Usage: shuffle <ascii picture> <speed> <\"color\">\n"
                    "speed: 1 is fast and >500 very slow, -1 = immediately.\n"
-                   "color: Must be in quotation marks of format: \"r;g;b\" or just \"random\".\n"
+                   "color: Must be in quotation marks of format: \"r;g;b\" or one of the standard colors:\n"
+                   "\"red\", \"green\", \"yellow\", \"blue\", \"magenta\", \"cyan\", \"orange\", \"white\", \"grey\" or just \"random\".\n"
                    "Example: shuffle file.ascii 10 \"50;255;50\" - prints \"file.ascii\" in bright green.\n\033[0m"
                    "\033[1;32mLeave a star if you like it: https://github.com/lennart1978/shuffle\033[0m\n";
 

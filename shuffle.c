@@ -17,7 +17,8 @@ void shuffle(int *array, int n)
 
 int show_shuffled(const char *ansi_pic, int speed, char *rgb)
 {
-    req.tv_nsec = speed * 10000;
+    // The wait time between each printed char is:  speed * 10000 nanoseconds
+    req.tv_nsec = speed * NSECONDS;
     req.tv_sec = 0;
     int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels;
     int flag = 0;
@@ -59,28 +60,48 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     int shuffle_array[total_pixels];
 
     // Fill the shuffle array with ascending numbers.
-    for (int i = 0; i < total_pixels; shuffle_array[i] = i++)
-        ;
+    for (int i = 0; i < total_pixels; shuffle_array[i] = i)
+        i++;
 
     // Shuffle all the numbers in the array
     shuffle(shuffle_array, total_pixels);
 
-    if (strcmp(rgb, "random") == 0)
+    int r, g, b;
+
+    if (!strcmp(rgb, "random")) // Print with random RGB color
     {
         srand(time(NULL));
-
-        int r = rand() % 255;
-        int g = rand() % 255;
-        int b = rand() % 255;
-
-        // Use random RGB colors
-        printf("\033[38;2;%d;%d;%dm", r, g, b);
+        r = rand() % 255;
+        g = rand() % 255;
+        b = rand() % 255;
     }
+    else if (!strcmp(rgb, "red"))
+        r = 255, g = 0, b = 0;
+    else if (!strcmp(rgb, "green"))
+        r = 0, g = 255, b = 0;
+    else if (!strcmp(rgb, "yellow"))
+        r = 255, g = 255, b = 0;
+    else if (!strcmp(rgb, "blue"))
+        r = 0, g = 0, b = 255;
+    else if (!strcmp(rgb, "magenta"))
+        r = 255, g = 0, b = 255;
+    else if (!strcmp(rgb, "cyan"))
+        r = 0, g = 255, b = 255;
+    else if (!strcmp(rgb, "white"))
+        r = 255, g = 255, b = 255;
+    else if (!strcmp(rgb, "grey"))
+        r = 0, g = 0, b = 0;
+    else if (!strcmp(rgb, "orange"))
+        r = 255, g = 165, b = 0;
     else
-    {
-        // Set text color to <color> argument
-        printf("\033[38;2;%sm", rgb);
+    {        
+        printf("\033[38;2;%sm", rgb); // Print with given RGB values
+        goto jump;
     }
+
+    printf("\033[38;2;%d;%d;%dm", r, g, b); // Print with one of the 'standard' colors
+
+jump:
 
     // Hide the cursor
     printf(INVISIBLE);

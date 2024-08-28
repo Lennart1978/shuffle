@@ -32,7 +32,11 @@ make:
 make
 ```
 
+<<<<<<< HEAD
 # Install with meson or make:
+=======
+Install with meson or make:
+>>>>>>> c90ed1d2772690e410957b29ae8ca836b3107344
 
 meson:
 

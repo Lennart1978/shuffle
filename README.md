@@ -7,7 +7,7 @@ shuffle SOURCE -s speed -c color
 
 -s  speed: 1 is fast and >500 very slow, -1 = immediately.
 
--s  color: Must be in format: r;g;b or one of the standard colors:
+-s  color: Must be in format: "r;g;b" or one of the standard colors:
            red, green, yellow, blue, magenta, cyan, orange, white, black or just random.
 
 -h  show this help.

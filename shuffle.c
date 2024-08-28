@@ -89,7 +89,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
         r = 0, g = 255, b = 255;
     else if (!strcmp(rgb, "white"))
         r = 255, g = 255, b = 255;
-    else if (!strcmp(rgb, "grey"))
+    else if (!strcmp(rgb, "black"))
         r = 0, g = 0, b = 0;
     else if (!strcmp(rgb, "orange"))
         r = 255, g = 165, b = 0;

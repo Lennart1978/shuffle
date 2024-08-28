@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 // Nanoseconds multiplied with speed
 #define NSECONDS 10000

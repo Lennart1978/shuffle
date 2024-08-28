@@ -26,23 +26,12 @@ make:
 make
 ```
 
-Run a test(build with meson):
-
-```bash
-cd builddir && ./shuffle ../test.ascii 10 "50;255;50"
-```
-
-- with make:
-```bash
-./shuffle test.ascii 10 "50;255;50"
-```
-
 Install with meson or make:
 
-meson (when in builddir):
+meson:
 
 ```bash
-sudo meson install
+sudo meson install -C builddir
 ```
 
 make:

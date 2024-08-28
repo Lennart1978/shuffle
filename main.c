@@ -2,7 +2,7 @@
 
 const char *help = "----------------------------------------------------------------------\n"
                    "\033[1;35mshuffle: This command prints an ASCII art picture with shuffle effect.\n\033[0m"
-                   "---------------------------------v"VERSION"-------------------------------\n\033[1m"
+                   "---------------------------------\033[1;31mv"VERSION"\033[0m-------------------------------\n\033[1m"
                    "Usage: shuffle <ascii picture> <speed> <\"color\">\n"
                    "speed: 1 is fast and >500 very slow, -1 = immediately.\n"
                    "color: Must be in quotation marks of format: \"r;g;b\" or one of the standard colors:\n"

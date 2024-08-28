@@ -1,6 +1,6 @@
 # Projektname und Version
 PROJECT = shuffle
-VERSION = 1.0.3
+VERSION = 1.0.4
 
 # Compiler und Compiler-Flags
 CC = gcc

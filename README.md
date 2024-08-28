@@ -1,4 +1,4 @@
-## shuffle
+# shuffle
 Shuffle command prints out an ASCII art picture with a cool shuffle effect.
 
 Usage:
@@ -18,7 +18,7 @@ Example: shuffle file.ascii -s 10 -c "50;255;50"  prints file.ascii in bright gr
          shuffle file.ascii -s 50 -c orange  prints it with standard color (orange).
 
 
-# Build with meson or make:
+## Build with meson or make:
 
 meson:
 
@@ -32,7 +32,7 @@ make:
 make
 ```
 
-# Install with meson or make:
+## Install with meson or make:
 
 meson:
 
@@ -46,7 +46,7 @@ make:
 sudo make install
 ```
 
-# For Archlinux users: It is in the AUR now 'shuffle-ascii'.
+## For Archlinux users: It is in the AUR now 'shuffle-ascii'.
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>

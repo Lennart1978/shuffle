@@ -93,6 +93,8 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
         r = 0, g = 0, b = 0;
     else if (!strcmp(rgb, "orange"))
         r = 255, g = 165, b = 0;
+    else if (!strcmp(rgb, "grey"))
+        r = 127, g = 127, b = 127;
     else
     {        
         printf("\033[38;2;%sm", rgb); // Print with given RGB values
@@ -148,7 +150,7 @@ jump:
     // Show the cursor again
     printf(VISIBLE);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int load_ascii(const char *filename)
@@ -160,8 +162,8 @@ int load_ascii(const char *filename)
     file = fopen(filename, "r");
     if (!file)
     {
-        fprintf(stderr, "Can't load file.\n");
-        return 1;
+        fprintf(stderr, "Can't load file %s\n", filename);
+        return EXIT_FAILURE;
     }
 
     // Get file size
@@ -175,7 +177,7 @@ int load_ascii(const char *filename)
     {
         fprintf(stderr, "Can't allocate memory for 'ansi_pic'");
         file ? fclose(file) : 0;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Pointer to ascii_pic
@@ -191,5 +193,5 @@ int load_ascii(const char *filename)
     // Close the file
     fclose(file);
 
-    return 0;
+    return EXIT_SUCCESS;
 }

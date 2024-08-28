@@ -6,7 +6,7 @@ const char *help = "------------------------------------------------------------
                    "Usage:\nshuffle SOURCE -s speed -c color\n\n"
                    "-s  speed: 1 is fast and >500 very slow, -1 = immediately.\n"
                    "-s  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
-                   "    red, green, yellow, blue, magenta, cyan, orange, white, black or just random.\n"
+                   "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
                    "-h  show this help.\n\n"
                    "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
                    "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n\n\033[0m"
@@ -35,26 +35,26 @@ int main(int argc, char *argv[])
             rgbColors = optarg;
             break;
         case '?':
-            printf("Type -h for help\n");
+            fprintf(stderr, "Wrong argumets: Type -h for help\n");
             return EXIT_FAILURE;
         }
     }
 
     if (!rgbColors || !speed)
     {
-        printf("Type -h for help\n");
+        fprintf(stderr, "Type -h for help\n");
         return EXIT_FAILURE;
     }
 
     if (load_ascii(argv[optind]) != 0)
     {
-        fprintf(stderr, "Error loading ascii.\n");
+        fprintf(stderr, "Error loading ASCII file.\n");
         return EXIT_FAILURE;
     }
 
     if (show_shuffled(ascii_pic, atoi(speed), rgbColors) != 0)
     {
-        fprintf(stderr, "Error shuffling ascii picture.\n");
+        fprintf(stderr, "Error shuffling ASCII picture.\n");
         free(ascii_pic);
         return EXIT_FAILURE;
     }

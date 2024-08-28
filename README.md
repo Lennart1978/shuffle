@@ -8,7 +8,7 @@ shuffle SOURCE -s speed -c color
 -s  speed: 1 is fast and >500 very slow, -1 = immediately.
 
 -s  color: Must be in format: "r;g;b" or one of the standard colors:
-           red, green, yellow, blue, magenta, cyan, orange, white, black or just random.
+           red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.
 
 -h  show this help.
 
@@ -48,3 +48,4 @@ sudo make install
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>
+<img src="shuffle-ascii_flowchart.png" alt="flowchart" width="2056" height="3840"></img>

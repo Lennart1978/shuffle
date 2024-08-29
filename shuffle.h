@@ -6,7 +6,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#define VERSION "1.0.4"
+#define HELP 1
+#define NO_HELP 0
+
+#define VERSION "1.1.0"
 
 // Nanoseconds multiplied with speed
 #define NSECONDS 10000
@@ -40,7 +43,7 @@ extern char *ascii_pic;
 
 void shuffle(int *array, int n);
 int load_ascii(const char *filename);
-int show_shuffled(const char *ansi_pic, int speed, char *rgb);
+int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help);
 
 // Swap a and b very fast (inline Assembly test: not necessary, C is really fast enough)
 static inline void swap(int *a, int *b)

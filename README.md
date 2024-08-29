@@ -1,6 +1,8 @@
 # shuffle
 Shuffle command prints out an ASCII art picture with a cool shuffle effect.
 
+## Version 1.1.0: Now you can shuffle every textfile !
+
 Usage:
 
 shuffle SOURCE -s speed -c color
@@ -11,6 +13,8 @@ shuffle SOURCE -s speed -c color
            red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.
 
 -h  show this help.
+
+-v  show version
 
 Example: shuffle file.ascii -s 10 -c "50;255;50"  prints file.ascii in bright green.
          shuffle file.ascii -s 50 -c orange  prints it with standard color (orange).

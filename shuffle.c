@@ -15,43 +15,60 @@ void shuffle(int *array, int n)
     }
 }
 
-int show_shuffled(const char *ansi_pic, int speed, char *rgb)
+int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
 {
     // The wait time between each printed char is:  speed * 10000 nanoseconds
     req.tv_nsec = speed * NSECONDS;
     req.tv_sec = 0;
-    int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels;
+    int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels, max_length = 0, c;
     int flag = 0;
 
     row = col = 0;
 
-    // count rows and columns
-    for (int i = 0; i < (int)strlen(ansi_pic); i++, col++)
+    // Pointer to the loaded string
+    char *textfile;
+    textfile = ansi_pic;
+
+    // Get 2D dimension of the text file (x = max_length, y = rows)
+    for (c = *textfile; c != '\0'; max_length = col > max_length ? col : max_length)
     {
-        if (ansi_pic[i] == '\n')
-        {
-            row++;
-            // Get the longest row of the picture
-            width = (col > width) ? col : width;
-            col = 0;
-        }
+        c == '\n' ? col = 0, col++, row++ : col++;
+        c = *textfile++;
     }
 
+    // Reset pointer
+    textfile = ansi_pic;
+
+    // Create 2D text array
+    char pic_array[row + 1][max_length];
+
+    width = max_length - 1;
     height = row;
 
-    // Or total_pixels = (int)strlen(ansi_pic) is the same
     total_pixels = height * width;
-
-    /* With exact width and height,
-     * we can declare the perfect buffer now: */
-    char pic_array[height][width];
 
     row = col = 0;
 
-    // Store the ASCII picture in 2D array
-    for (int i = 0; i < total_pixels; pic_array[row][col++] = ansi_pic[i++])
+    /*Fill shorter rows with blank spaces and replace tabs with blank space.
+     *Store everything in 2D array */
+    while ((c = *textfile++) != '\0')
     {
-        ansi_pic[i] == '\n' ? row++, col = 0 : 0;
+        pic_array[row][col] = (char)c;
+        if (c == '\n')
+        {
+            if (col < max_length - 1)
+            {
+                for (c = ' '; col <= max_length; pic_array[row][col++] = (char)c)
+                    ;
+            }
+            col = -1;
+            row++;
+        }
+        else if (c == '\t')
+        {
+            pic_array[row][col] = ' ';
+        }
+        col++;
     }
 
     // Delete screen and go to position 1, 1
@@ -60,8 +77,10 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     int shuffle_array[total_pixels];
 
     // Fill the shuffle array with ascending numbers.
-    for (int i = 0; i < total_pixels; shuffle_array[i] = i)
-        i++;
+    for (int i = 0; i < total_pixels; i++)
+    {
+        shuffle_array[i] = i;
+    }
 
     // Shuffle all the numbers in the array
     shuffle(shuffle_array, total_pixels);
@@ -96,7 +115,7 @@ int show_shuffled(const char *ansi_pic, int speed, char *rgb)
     else if (!strcmp(rgb, "grey"))
         r = 127, g = 127, b = 127;
     else
-    {        
+    {
         printf("\033[38;2;%sm", rgb); // Print with given RGB values
         goto jump;
     }
@@ -109,7 +128,7 @@ jump:
     printf(INVISIBLE);
 
     // Show and delete the ASCII picture with amazing shuffle effect
-    for (int p = 0; p < 2; p++)
+    for (int p = 0; p < (is_help ? 1 : 2); p++)
     {
         for (int i = 0; i < total_pixels; i++)
         {
@@ -127,31 +146,33 @@ jump:
         }
 
         // Show the ASCII art for 2 seconds at first glance (with bit flag)
-        !(flag & IS_END_FLAG) ? sleep(2), flag |= IS_END_FLAG : 0;
+        ((!(flag & IS_END_FLAG)) && !is_help) ? sleep(2), flag |= IS_END_FLAG : 0;
 
-        // Shuffle the array again for deletion effect
-        shuffle(shuffle_array, total_pixels);
-
-        // Delete the 2D array (Fill with blank spaces)
-
-        for (int r = 0; r < height; r++)
+        if (!is_help)
         {
-            for (int q = 0; q < width; pic_array[r][q++] = ' ')
-                ;
+            // Shuffle the array again for deletion effect
+            shuffle(shuffle_array, total_pixels);
+
+            // Delete the 2D array (Fill with blank spaces)
+            for (int r = 0; r < height; r++)
+            {
+                for (int q = 0; q < width; pic_array[r][q++] = ' ')
+                    ;
+            }
         }
     }
-
     // Reset text mode
     printf(RST);
 
-    // Delete screen and go to position 1, 1
-    printf(CLRJ);
+    // Delete screen and go to position 1, 1 (only if not showing help)
+    !is_help ? printf(CLRJ) : printf("\033[18;1H");
 
     // Show the cursor again
     printf(VISIBLE);
 
     return EXIT_SUCCESS;
 }
+
 
 int load_ascii(const char *filename)
 {

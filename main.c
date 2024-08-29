@@ -2,14 +2,15 @@
 
 char *help = "----------------------------------------------------------------------\n"
                    "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
-                   "---------------------------------v" VERSION "-------------------------------\n"
-                   "Usage:\nshuffle SOURCE -s speed -c color\n\n"
+                   "---------------------------------v" VERSION "Termux aarch64-----------------\n"
+                   "Usage:\nshuffle -s speed -c color SOURCE\n\n"
                    "-s  speed: 1 is fast and >500 very slow, -1 = immediately.\n"
                    "-s  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
                    "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
-                   "-h  show this help.\n\n"
-                   "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
-                   "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n\n"
+                   "-h  show this help.\n"
+                   "-v  show version\n\n"
+                   "Example: shuffle -s 10 -c \"50;255;50\" file.ascii :prints file.ascii in bright green.\n"
+                   "         shuffle -s 50 -c yellow file.ascii :prints it in standard color (yellow).\n\n"
                    "Leave a star if you like it: https://github.com/lennart1978/shuffle\n\n";
 
 int main(int argc, char *argv[])
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
             show_shuffled(help, 50, "white", HELP);
             return EXIT_SUCCESS;
         case 'v':
-            printf("Version:" VERSION "\n");
+            printf("Version:" VERSION "Termux aarch64\n");
             return EXIT_SUCCESS;
         case 's':
             speed = optarg;

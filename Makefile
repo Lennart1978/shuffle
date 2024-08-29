@@ -4,15 +4,14 @@ VERSION = 1.1.0
 
 # Compiler und Compiler-Flags
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -s
-LDFLAGS = -s
+CFLAGS = -Wall -Wextra -O2
 
 # Quellen und Objekte
 SOURCES = main.c shuffle.c
 OBJECTS = $(SOURCES:.c=.o)
 
 # Installationsverzeichnis
-PREFIX = /usr
+PREFIX = /data/data/com.termux/files/usr
 
 # Zielregel
 all: $(PROJECT)

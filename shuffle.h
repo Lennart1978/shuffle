@@ -45,15 +45,10 @@ void shuffle(int *array, int n);
 int load_ascii(const char *filename);
 int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help);
 
-// Swap a and b very fast (inline Assembly test: not necessary, C is really fast enough)
+// Swap a and b
 static inline void swap(int *a, int *b)
 {
-    __asm__(
-        "movl (%0), %%eax;\n"
-        "movl (%1), %%ebx;\n"
-        "movl %%ebx, (%0);\n"
-        "movl %%eax, (%1);"
-        :
-        : "r"(a), "r"(b)
-        : "%eax", "%ebx");
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }

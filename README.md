@@ -28,7 +28,11 @@ make
 
 ## Install:
 
-Copy the compiled binary 'shuffle' to your PATH. (or use the binary from releas)
+```bash
+sudo make install
+```
+
+Or copy the compiled binary 'shuffle' to your PATH. (the binary from release)
 
 (/data/data/com.termux/files/usr/bin)
 

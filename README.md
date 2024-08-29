@@ -52,4 +52,4 @@ sudo make install
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>
-<img src="shuffle-ascii_flowchart.png" alt="flowchart" width="2056" height="3840"></img>
+<img src="shuffle_ascii_flowchart.png" alt="flowchart" width="2056" height="3840"></img>

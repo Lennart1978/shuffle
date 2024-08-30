@@ -1,13 +1,9 @@
 project(
     'shuffle',
     'c',
-    version: '1.1.0',
-    default_options: ['warning_level=3', 'buildtype=release'],
+    version: '1.1.1',
+    default_options: ['warning_level=0', 'buildtype=release', 'strip=true'],
 )
-
-# Compiler- und Linker-Flags zum Strippen der Binärdatei
-add_global_arguments('-s', language: ['c', 'cpp'])
-add_global_link_arguments('-s', language: ['c', 'cpp'])
 
 inc = include_directories('.')
 sources = ['main.c', 'shuffle.c']

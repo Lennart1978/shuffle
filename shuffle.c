@@ -62,7 +62,7 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
         {
             if (col < max_length - 1)
             {
-                for (c = ' '; col <= max_length; pic_array[row][col++] = (char)c)
+                for (c = ' '; col < max_length; pic_array[row][col++] = (char)c)
                     ;
             }
             col = -1;

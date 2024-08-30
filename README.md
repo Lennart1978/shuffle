@@ -50,4 +50,5 @@ sudo make install
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>
+<img src="FischerYatesShuffle.png" alt="shuffle algorith" width="1184" height="708"></img>
 <img src="shuffle-main-algo.png" alt="flowchart" width="1618" height="3840"></img>

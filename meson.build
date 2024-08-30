@@ -1,7 +1,7 @@
 project(
     'shuffle',
     'c',
-    version: '1.1.1',
+    version: '1.1.2',
     default_options: [
         'warning_level=3',      # Erhöht das Warnlevel auf 3, um mehr potenzielle Probleme zu erkennen
         'buildtype=release',

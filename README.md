@@ -1,7 +1,6 @@
 # shuffle Termux / aarch64 version
 Shuffle command prints out an ASCII art picture with a cool shuffle effect.
-
-## Version 1.1.0: Now you can shuffle every textfile !
+You can also shuffle every kind of text file. (>=v1.0.0)
 
 Usage:
 

@@ -78,7 +78,7 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
     // Delete screen and go to position 1, 1
     printf(CLRJ);
 
-      int *shuffle_array = malloc(total_pixels * sizeof(int));
+    int *shuffle_array = malloc(total_pixels * sizeof(int));
 
     // Fill the shuffle array with ascending numbers.
     for (int i = 0; i < total_pixels; i++)
@@ -185,7 +185,6 @@ jump:
 
     return EXIT_SUCCESS;
 }
-
 
 int load_ascii(const char *filename)
 {

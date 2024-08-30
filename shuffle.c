@@ -40,7 +40,11 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
     textfile = ansi_pic;
 
     // Create 2D text array
-    char pic_array[row + 1][max_length];
+    char **pic_array = malloc((row + 1) * sizeof(char *));
+    for (int i = 0; i < row + 1; i++)
+    {
+        pic_array[i] = malloc(max_length * sizeof(char));
+    }
 
     width = max_length - 1;
     height = row;
@@ -58,7 +62,7 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
         {
             if (col < max_length - 1)
             {
-                for (c = ' '; col <= max_length; pic_array[row][col++] = (char)c)
+                for (c = ' '; col < max_length; pic_array[row][col++] = (char)c)
                     ;
             }
             col = -1;
@@ -74,7 +78,7 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
     // Delete screen and go to position 1, 1
     printf(CLRJ);
 
-    int shuffle_array[total_pixels];
+    int *shuffle_array = malloc(total_pixels * sizeof(int));
 
     // Fill the shuffle array with ascending numbers.
     for (int i = 0; i < total_pixels; i++)
@@ -170,9 +174,16 @@ jump:
     // Show the cursor again
     printf(VISIBLE);
 
+    for (int i = 0; i < row + 1; i++)
+    {
+        free(pic_array[i]);
+    }
+    free(pic_array);
+
+    free(shuffle_array);
+
     return EXIT_SUCCESS;
 }
-
 
 int load_ascii(const char *filename)
 {

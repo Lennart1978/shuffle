@@ -39,4 +39,4 @@ Or copy the compiled binary 'shuffle' to your PATH. (the binary from release)
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>
-<img src="shuffle-main-algo.png" alt="flowchart" width="1618" height="3840"></img>
+

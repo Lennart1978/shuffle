@@ -1,12 +1,20 @@
 project(
     'shuffle',
     'c',
+<<<<<<< HEAD
     version: '1.1.1',
     default_options: [
         'warning_level=3',      # Erhöht das Warnlevel auf 3, um mehr potenzielle Probleme zu erkennen
         'buildtype=release',
         'strip=true',
         'c_std=c11'
+=======
+    version: '1.1.2',
+    default_options: [
+        'warning_level=3',      # Erhöht das Warnlevel auf 3, um mehr potenzielle Probleme zu erkennen
+        'buildtype=release',
+        'strip=true'
+>>>>>>> f29f06527a06ea677580be24fd398fa91ef91a8c
     ],
 )
 

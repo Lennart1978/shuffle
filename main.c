@@ -6,7 +6,7 @@ char *help = "------------------------------------------------------------------
              "---------------------------------v" VERSION "-------------------------------\n"
              "Usage:\nshuffle SOURCE -s speed -c color\n\n"
              "-s  speed: 1 is fast and >500 very slow, -1 = immediately.\n"
-             "-s  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
+             "-c  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
              "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
              "-h  show this help.\n\n"
              "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"

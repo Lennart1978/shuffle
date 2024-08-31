@@ -39,4 +39,5 @@ Or copy the compiled binary 'shuffle' to your PATH. (the binary from release)
 
 <img src="shuffle.gif" alt="shuffle.gif"></img>
 <img src="bytheway.gif" alt="bytheway.gif"></img>
+<img src="F-Y-Shuffle_mermaid.png" alt="Mermaid flowchart"></img>
 

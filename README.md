@@ -1,7 +1,7 @@
 # shuffle
 Shuffle command prints out an ASCII art picture with a cool shuffle effect.
 
-You can also shuffle every kind of text file(with Unicode characters).
+You can also shuffle all text files, even with Unicode characters.
 
 Usage:
 

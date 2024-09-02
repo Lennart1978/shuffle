@@ -58,7 +58,7 @@ int show_shuffled(wchar_t *ansi_pic, int speed, char *rgb, int is_help)
         return EXIT_FAILURE;
     }
 
-    width = max_length - 1;
+    width = max_length;
     height = row;
 
     total_pixels = height * width;

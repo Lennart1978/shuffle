@@ -205,7 +205,7 @@ int load_ascii(const char *filename)
     FILE *file = NULL;
     wint_t wc;
     size_t read_chars = 0;
-    size_t buffer_size = 1024; // Startgröße des Puffers
+    size_t buffer_size = 1024;
 
     file = fopen(filename, "r");
     if (!file)

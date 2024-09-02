@@ -13,7 +13,7 @@
 #define HELP 1
 #define NO_HELP 0
 
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 // Nanoseconds multiplied with speed
 #define NSECONDS 10000

@@ -1,7 +1,7 @@
 #include "shuffle.h"
 
 int width, height;
-char *ascii_pic;
+wchar_t *ascii_pic;
 struct timespec req;
 
 // The Fischer - Yates shuffle algorithm
@@ -15,35 +15,47 @@ void shuffle(int *array, int n)
     }
 }
 
-int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
+int show_shuffled(wchar_t *ansi_pic, int speed, char *rgb, int is_help)
 {
     // The wait time between each printed char is:  speed * 10000 nanoseconds
     req.tv_nsec = speed * NSECONDS;
     req.tv_sec = 0;
-    int shuffle_index, shuffled_row, shuffled_col, row, col, total_pixels, max_length = 0, c;
+    int shuffle_index = 0, shuffled_row = 0, shuffled_col = 0, row = 0, col = 0, total_pixels = 0, max_length = 0;
+    wchar_t c;
     int flag = 0;
 
-    row = col = 0;
-
     // Pointer to the loaded string
-    char *textfile;
+    wchar_t *textfile;
     textfile = ansi_pic;
 
     // Get 2D dimension of the text file (x = max_length, y = rows)
-    for (c = *textfile; c != '\0'; max_length = col > max_length ? col : max_length)
+    while ((c = *textfile++) != L'\0')
     {
-        c == '\n' ? col = 0, col++, row++ : col++;
-        c = *textfile++;
+        if (c == L'\n')
+        {
+            row++;
+            max_length = col > max_length ? col : max_length;
+            col = -1;
+        }
+        col++;
     }
 
     // Reset pointer
     textfile = ansi_pic;
 
     // Create 2D text array
-    char **pic_array = malloc((row + 1) * sizeof(char *));
+    wchar_t **pic_array = malloc(((long unsigned int)(row + 1) * sizeof(wchar_t *)));
+
     for (int i = 0; i < row + 1; i++)
     {
-        pic_array[i] = malloc(max_length * sizeof(char));
+        pic_array[i] = malloc((long unsigned int)(max_length + 1) * sizeof(wchar_t));
+    }
+
+    if (pic_array == NULL)
+    {
+        wprintf(L"Can't allocate memory for 'pic_array'.\n");
+
+        return EXIT_FAILURE;
     }
 
     width = max_length - 1;
@@ -55,30 +67,30 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
 
     /*Fill shorter rows with blank spaces and replace tabs with blank space.
      *Store everything in 2D array */
-    while ((c = *textfile++) != '\0')
+    while ((c = *textfile++) != L'\0')
     {
-        pic_array[row][col] = (char)c;
+        pic_array[row][col] = c;
         if (c == '\n')
         {
             if (col < max_length - 1)
             {
-                for (c = ' '; col < max_length; pic_array[row][col++] = (char)c)
+                for (c = L' '; col < max_length; pic_array[row][col++] = c)
                     ;
             }
             col = -1;
             row++;
         }
-        else if (c == '\t')
+        else if (c == L'\t')
         {
-            pic_array[row][col] = ' ';
+            pic_array[row][col] = L' ';
         }
         col++;
     }
 
     // Delete screen and go to position 1, 1
-    printf(CLRJ);
+    wprintf(L"\033[2J\033[1;1H");
 
-    int *shuffle_array = malloc(total_pixels * sizeof(int));
+    int *shuffle_array = malloc((long unsigned int)total_pixels * sizeof(int));
 
     // Fill the shuffle array with ascending numbers.
     for (int i = 0; i < total_pixels; i++)
@@ -93,7 +105,7 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
 
     if (!strcmp(rgb, "random")) // Print with random RGB color
     {
-        srand(time(NULL));
+        srand((unsigned int)time(NULL));
         r = rand() % 255;
         g = rand() % 255;
         b = rand() % 255;
@@ -120,16 +132,16 @@ int show_shuffled(char *ansi_pic, int speed, char *rgb, int is_help)
         r = 127, g = 127, b = 127;
     else
     {
-        printf("\033[38;2;%sm", rgb); // Print with given RGB values
+        wprintf(L"\033[38;2;%sm", rgb); // Print with given RGB values
         goto jump;
     }
 
-    printf("\033[38;2;%d;%d;%dm", r, g, b); // Print with one of the 'standard' colors
+    wprintf(L"\033[38;2;%d;%d;%dm", r, g, b); // Print with one of the 'standard' colors
 
 jump:
 
     // Hide the cursor
-    printf(INVISIBLE);
+    wprintf(L"\033[?25l");
 
     // Show and delete the ASCII picture with amazing shuffle effect
     for (int p = 0; p < (is_help ? 1 : 2); p++)
@@ -141,9 +153,9 @@ jump:
             shuffled_col = shuffle_index % width;
 
             // Move Cursor to shuffled position
-            printf("\033[%d;%dH", shuffled_row + 1, shuffled_col + 1);
+            wprintf(L"\033[%d;%dH", shuffled_row + 1, shuffled_col + 1);
             // Print char at shuffled position
-            printf("%c", pic_array[shuffled_row][shuffled_col]);
+            wprintf(L"%lc", pic_array[shuffled_row][shuffled_col]);
             // Wait some nanoseconds after every char
             nanosleep(&req, NULL);
             fflush(stdout);
@@ -158,22 +170,24 @@ jump:
             shuffle(shuffle_array, total_pixels);
 
             // Delete the 2D array (Fill with blank spaces)
-            for (int r = 0; r < height; r++)
+            for (int r2 = 0; r2 < height; r2++)
             {
-                for (int q = 0; q < width; pic_array[r][q++] = ' ')
+                for (int q = 0; q < width; pic_array[r2][q++] = L' ')
                     ;
             }
         }
     }
-    // Reset text mode
-    printf(RST);
-
-    // Delete screen and go to position 1, 1 (only if not showing help)
-    !is_help ? printf(CLRJ) : printf("\033[18;1H");
 
     // Show the cursor again
-    printf(VISIBLE);
+    wprintf(L"\033[?25h");
 
+    // Reset text mode
+    wprintf(L"\033[0m");
+
+    // Delete screen and go to position 1, 1 (only if not showing help)
+    !is_help ? wprintf(L"0\33[2J\033[1;1H") : wprintf(L"\033[19;1H");
+
+    // free the allocated memory
     for (int i = 0; i < row + 1; i++)
     {
         free(pic_array[i]);
@@ -188,43 +202,55 @@ jump:
 
 int load_ascii(const char *filename)
 {
-    long file_len;
-    FILE *file;
-    int c;
+    FILE *file = NULL;
+    wint_t wc;
+    size_t read_chars = 0;
+    size_t buffer_size = 1024; // Startgröße des Puffers
 
     file = fopen(filename, "r");
     if (!file)
     {
-        fprintf(stderr, "Can't load file %s\n", filename);
+        wprintf(L"Can't load file %s: %s\n", filename, strerror(errno));
         return EXIT_FAILURE;
     }
 
-    // Get file size
-    fseek(file, 0, SEEK_END);
-    file_len = ftell(file);
-    rewind(file);
+    ascii_pic = malloc(buffer_size * sizeof(wchar_t));
 
-    // Allocate memory with size of file + 1 for null termination
-    ascii_pic = malloc((size_t)file_len + 1);
     if (!ascii_pic)
     {
-        fprintf(stderr, "Can't allocate memory for 'ansi_pic'");
-        file ? fclose(file) : 0;
+        wprintf(L"Can't allocate memory for 'ascii_pic'\n");
+        fclose(file);
         return EXIT_FAILURE;
     }
 
-    // Pointer to ascii_pic
-    char *temp = ascii_pic;
+    while ((wc = fgetwc(file)) != WEOF)
+    {
+        if (read_chars >= buffer_size - 1)
+        {
+            buffer_size *= 2;
+            wchar_t *new_buffer = realloc(ascii_pic, buffer_size * sizeof(wchar_t));
+            if (!new_buffer)
+            {
+                wprintf(L"Memory reallocation failed\n");
+                free(ascii_pic);
+                fclose(file);
+                return EXIT_FAILURE;
+            }
+            ascii_pic = new_buffer;
+        }
+        ascii_pic[read_chars++] = (wchar_t)wc;
+    }
 
-    // Read all chars from file and store them in ascii_pic
-    while ((c = getc(file)) != EOF)
-        *temp++ = (char)c;
+    if (ferror(file))
+    {
+        wprintf(L"Error reading file: %s\n", strerror(errno));
+        free(ascii_pic);
+        fclose(file);
+        return EXIT_FAILURE;
+    }
 
-    // NULL termination
-    *temp = '\0';
+    ascii_pic[read_chars] = L'\0';
 
-    // Close the file
     fclose(file);
-
     return EXIT_SUCCESS;
 }

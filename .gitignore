@@ -3,3 +3,4 @@
 .vscode/settings.json
 builddir
 build
+update-version.sh

@@ -15,7 +15,7 @@ void shuffle(int *array, int n)
     }
 }
 
-int show_shuffled(wchar_t *ansi_pic, int speed, char *rgb, int is_help)
+int show_shuffled(void (*p_effect)(int *, int), wchar_t *ansi_pic, int speed, char *rgb, int is_help)
 {
     // The wait time between each printed char is:  speed * 10000 nanoseconds
     req.tv_nsec = speed * NSECONDS;
@@ -99,7 +99,7 @@ int show_shuffled(wchar_t *ansi_pic, int speed, char *rgb, int is_help)
     }
 
     // Shuffle all the numbers in the array
-    shuffle(shuffle_array, total_pixels);
+    p_effect(shuffle_array, total_pixels);
 
     int r, g, b;
 
@@ -167,7 +167,7 @@ jump:
         if (!is_help)
         {
             // Shuffle the array again for deletion effect
-            shuffle(shuffle_array, total_pixels);
+            p_effect(shuffle_array, total_pixels);
 
             // Delete the 2D array (Fill with blank spaces)
             for (int r2 = 0; r2 < height; r2++)

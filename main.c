@@ -36,6 +36,9 @@ int main(int argc, char *argv[])
     char *rgbColors = NULL;
     char *speed = NULL;
 
+    // Pointer to the shuffle function, maybe I'll add more effects...
+    void (*p_effect)(int *, int) = &shuffle;
+
     // Register SIGINT signal
     signal(SIGINT, handle_sigint);
 
@@ -44,7 +47,7 @@ int main(int argc, char *argv[])
         switch (option)
         {
         case 'h':
-            show_shuffled(help, 50, "white", HELP);
+            show_shuffled(p_effect, help, 50, "white", HELP);
             return EXIT_SUCCESS;
         case 'v':
             wprintf(L"Version:" VERSION "\n");
@@ -73,7 +76,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (show_shuffled(ascii_pic, atoi(speed), rgbColors, NO_HELP) != 0)
+    if (show_shuffled(p_effect, ascii_pic, atoi(speed), rgbColors, NO_HELP) != 0)
     {
         wprintf(L"Error shuffling ASCII picture.\n");
         free(ascii_pic);

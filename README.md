@@ -9,8 +9,11 @@ You can also shuffle any text file, even if it contains Unicode characters.
 shuffle SOURCE -s speed -c color  
 
 -s speed: 1 is fast, >500 is very slow, -1 means immediately.
+
 -c color: Must be in the format "r;g;b" or one of the standard colors: red, green, yellow, blue, magenta, cyan, orange, white, black, grey, or just "random".
+
 -h show this help.
+
 -v show version.
 
 ### Example:
@@ -44,3 +47,6 @@ Make:
 sudo make install  
 ```
 For Arch Linux users: It is now available in the AUR as 'shuffle-ascii'.
+
+<img src="shuffle.gif" width="500">
+<img src="bytheway.gif" width="500">

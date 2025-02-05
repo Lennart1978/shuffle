@@ -1,55 +1,46 @@
-# shuffle
-Shuffle command prints out an ASCII art picture with a cool shuffle effect.
+##shuffle
 
-You can also shuffle all text files, even with Unicode characters.
+The shuffle command prints an ASCII art picture with a cool shuffle effect.
+
+You can also shuffle any text file, even if it contains Unicode characters.
 
 Usage:
 
-shuffle SOURCE -s speed -c color
+shuffle SOURCE -s speed -c color  
 
--s  speed: 1 is fast and >500 very slow, -1 = immediately.
+    -s speed: 1 is fast, >500 is very slow, -1 means immediately.
+    -c color: Must be in the format "r;g;b" or one of the standard colors: red, green, yellow, blue, magenta, cyan, orange, white, black, grey, or just "random".
+    -h show this help.
+    -v show version.
 
--c  color: Must be in format: "r;g;b" or one of the standard colors:
-           red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.
+Example:
 
--h  show this help.
+shuffle file.ascii -s 10 -c "50;255;50"  
 
--v  show version
+prints file.ascii in bright green.
 
-Example: shuffle file.ascii -s 10 -c "50;255;50"  prints file.ascii in bright green.
-         shuffle file.ascii -s 50 -c orange  prints it with standard color (orange).
+shuffle file.ascii -s 50 -c orange  
 
+prints it with the standard color (orange).
 
-## Build with meson or make:
+Build with Meson or Make:
 
-meson:
-
-```bash
-mkdir builddir && meson setup builddir --buildtype=release --prefix=/usr/bin && meson compile -C builddir
+Meson:
 ```
-
-make:
-
-```bash
-make
+mkdir builddir && meson setup builddir --buildtype=release --prefix=/usr/bin && meson compile -C builddir  
 ```
-
-## Install with meson or make:
-
-meson:
-
-```bash
-sudo meson install -C builddir
+Make:
 ```
-
-make:
-
-```bash
-sudo make install
+make  
 ```
+Install with Meson or Make:
 
-## For Archlinux users: It is in the AUR now 'shuffle-ascii'.
-
-<img src="shuffle.gif" alt="shuffle.gif"></img>
-<img src="bytheway.gif" alt="bytheway.gif"></img>
-<img src="F-Y-Shuffle_mermaid.png" alt="Mermaid flowchart"></img>
+Meson:
+```
+sudo meson install -C builddir  
+```
+Make:
+```
+sudo make install  
+```
+For Arch Linux users: It is now available in the AUR as 'shuffle-ascii'.

@@ -1,17 +1,17 @@
-## shuffle
+# shuffle
 
 The shuffle command prints an ASCII art picture with a cool shuffle effect.
 
 You can also shuffle any text file, even if it contains Unicode characters.
 
-Usage:
+### Usage:
 
 shuffle SOURCE -s speed -c color  
 
-    -s speed: 1 is fast, >500 is very slow, -1 means immediately.
-    -c color: Must be in the format "r;g;b" or one of the standard colors: red, green, yellow, blue, magenta, cyan, orange, white, black, grey, or just "random".
-    -h show this help.
-    -v show version.
+-s speed: 1 is fast, >500 is very slow, -1 means immediately.
+-c color: Must be in the format "r;g;b" or one of the standard colors: red, green, yellow, blue, magenta, cyan, orange, white, black, grey, or just "random".
+-h show this help.
+-v show version.
 
 ### Example:
 
@@ -23,7 +23,7 @@ shuffle file.ascii -s 50 -c orange
 
 prints it with the standard color (orange).
 
-Build with Meson or Make:
+### Build with Meson or Make:
 
 Meson:
 ```

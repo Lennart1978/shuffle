@@ -1,4 +1,4 @@
-##shuffle
+## shuffle
 
 The shuffle command prints an ASCII art picture with a cool shuffle effect.
 
@@ -13,7 +13,7 @@ shuffle SOURCE -s speed -c color
     -h show this help.
     -v show version.
 
-Example:
+### Example:
 
 shuffle file.ascii -s 10 -c "50;255;50"  
 

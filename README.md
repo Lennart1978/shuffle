@@ -48,5 +48,5 @@ sudo make install
 ```
 For Arch Linux users: It is now available in the AUR as 'shuffle-ascii'.
 
-<img src="shuffle.gif" width="500">
-<img src="bytheway.gif" width="500">
+<img src="shuffle.gif">
+<img src="bytheway.gif">

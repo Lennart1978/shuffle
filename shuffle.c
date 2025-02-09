@@ -15,7 +15,7 @@ void shuffle(int *array, int n)
     }
 }
 
-int show_shuffled(void (*p_effect)(int *, int), wchar_t *ansi_pic, int speed, char *rgb, int is_help)
+int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int speed, char *rgb, int is_help)
 {
     // The wait time between each printed char is:  speed * 10000 nanoseconds
     req.tv_nsec = speed * NSECONDS;
@@ -25,7 +25,7 @@ int show_shuffled(void (*p_effect)(int *, int), wchar_t *ansi_pic, int speed, ch
     int flag = 0;
 
     // Pointer to the loaded string
-    wchar_t *textfile;
+    const wchar_t *textfile;
     textfile = ansi_pic;
 
     // Get 2D dimension of the text file (x = max_length, y = rows)

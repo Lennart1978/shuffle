@@ -1,7 +1,7 @@
 project(
     'shuffle',
     'c',
-    version: '1.2.1',
+    version: '1.2.2',
     default_options: ['warning_level=3', 'buildtype=release', 'c_std=c11'],
 )
 
@@ -24,7 +24,7 @@ if get_option('buildtype') == 'debug'
 endif
 
 if get_option('buildtype') == 'release'
-    link_args += ['-Wl,-s'] # Fügt das Strip-Flag für den Linker hinzu
+    link_args += ['-Wl,-s']
 endif
 
 inc = include_directories('.')

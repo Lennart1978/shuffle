@@ -1,6 +1,6 @@
 #include "shuffle.h"
 
-wchar_t *help = L"---------------------------------------------------------------------\n"
+const wchar_t *help = L"---------------------------------------------------------------------\n"
                 "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
                 "--------------------------V.:"VERSION"-----------------------------------\n"
                 "Usage:\nshuffle SOURCE -s speed -c color\n\n"
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     char *speed = NULL;
 
     // Pointer to the shuffle function, maybe I'll add more effects...
-    void (*p_effect)(int *, int) = &shuffle;
+    void (*p_effect)(int *, int) = shuffle;
 
     // Register SIGINT signal
     signal(SIGINT, handle_sigint);

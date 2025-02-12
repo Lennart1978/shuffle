@@ -13,7 +13,7 @@
 #define HELP 1
 #define NO_HELP 0
 
-#define VERSION "1.2.2"
+#define VERSION "1.2.3"
 
 // Nanoseconds multiplied with speed
 #define NSECONDS 10000
@@ -32,11 +32,12 @@ extern wchar_t *ascii_pic;
 
 void shuffle(int *array, int n);
 int load_ascii(const char *filename);
+int is_valid_color(const char *color);
 
 // 'p_effect' is a pointer to a function for the effect.
-int show_shuffled(void(*p_effect)(int *, int), const wchar_t *ansi_pic, int speed, char *rgb, int is_help);
+int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int speed, char *rgb, int is_help);
 
-// Swap a and b very fast (inline Assembly test: not necessary, C is really fast enough)
+// (inline Assembly test: not necessary)
 static inline void swap(int *a, int *b)
 {
     __asm__(

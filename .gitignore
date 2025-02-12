@@ -4,3 +4,5 @@
 builddir
 build
 update-version.sh
+shuffle
+*.o

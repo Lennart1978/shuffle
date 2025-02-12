@@ -44,11 +44,11 @@ int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int spe
     textfile = ansi_pic;
 
     // Create 2D text array
-    wchar_t **pic_array = malloc(((long unsigned int)(row + 1) * sizeof(wchar_t *)));
+    wchar_t **pic_array = calloc((row + 1), sizeof(wchar_t *));
 
     for (int i = 0; i < row + 1; i++)
     {
-        pic_array[i] = malloc((long unsigned int)(max_length + 1) * sizeof(wchar_t));
+        pic_array[i] = calloc(max_length + 1, sizeof(wchar_t));
     }
 
     if (pic_array == NULL)
@@ -90,7 +90,7 @@ int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int spe
     // Delete screen and go to position 1, 1
     wprintf(L"\033[2J\033[1;1H");
 
-    int *shuffle_array = malloc((long unsigned int)total_pixels * sizeof(int));
+    int *shuffle_array = calloc((long unsigned int)total_pixels, sizeof(int));
 
     // Fill the shuffle array with ascending numbers.
     for (int i = 0; i < total_pixels; i++)
@@ -214,7 +214,7 @@ int load_ascii(const char *filename)
         return EXIT_FAILURE;
     }
 
-    ascii_pic = malloc(buffer_size * sizeof(wchar_t));
+    ascii_pic = calloc(buffer_size, sizeof(wchar_t));
 
     if (!ascii_pic)
     {

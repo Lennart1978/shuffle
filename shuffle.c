@@ -185,7 +185,7 @@ jump:
     wprintf(L"\033[0m");
 
     // Delete screen and go to position 1, 1 (only if not showing help)
-    !is_help ? wprintf(L"0\33[2J\033[1;1H") : wprintf(L"\033[19;1H");
+    !is_help ? wprintf(L"0\33[2J\033[1;1H") : wprintf(L"\033[22;1H");
 
     // free the allocated memory
     for (int i = 0; i < row + 1; i++)

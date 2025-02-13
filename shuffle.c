@@ -202,15 +202,28 @@ jump:
 
 int load_ascii(const char *filename)
 {
-    FILE *file = NULL;
     wint_t wc;
     size_t read_chars = 0;
     size_t buffer_size = 1024;
+    FILE *input_stream;
 
-    file = fopen(filename, "r");
-    if (!file)
+    if (strcmp(filename, "-") == 0)
     {
-        wprintf(L"Can't load file %s: %s\n", filename, strerror(errno));
+        input_stream = stdin;
+    }
+    else
+    {
+        input_stream = fopen(filename, "r");
+        if (!input_stream)
+        {
+            wprintf(L"Can't open input file: %s\n", strerror(errno));
+            return EXIT_FAILURE;
+        }
+    }
+
+    if (!filename)
+    {
+        wprintf(L"Invalid input filename\n");
         return EXIT_FAILURE;
     }
 
@@ -219,11 +232,10 @@ int load_ascii(const char *filename)
     if (!ascii_pic)
     {
         wprintf(L"Can't allocate memory for 'ascii_pic'\n");
-        fclose(file);
         return EXIT_FAILURE;
     }
 
-    while ((wc = fgetwc(file)) != WEOF)
+    while ((wc = fgetwc(input_stream)) != WEOF)
     {
         if (read_chars >= buffer_size - 1)
         {
@@ -233,7 +245,6 @@ int load_ascii(const char *filename)
             {
                 wprintf(L"Memory reallocation failed\n");
                 free(ascii_pic);
-                fclose(file);
                 return EXIT_FAILURE;
             }
             ascii_pic = new_buffer;
@@ -241,16 +252,16 @@ int load_ascii(const char *filename)
         ascii_pic[read_chars++] = (wchar_t)wc;
     }
 
-    if (ferror(file))
+    if (ferror(input_stream))
     {
-        wprintf(L"Error reading file: %s\n", strerror(errno));
+        wprintf(L"Error reading input: %s\n", strerror(errno));
         free(ascii_pic);
-        fclose(file);
         return EXIT_FAILURE;
     }
 
     ascii_pic[read_chars] = L'\0';
+    if (input_stream != stdin)
+        fclose(input_stream);
 
-    fclose(file);
     return EXIT_SUCCESS;
 }

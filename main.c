@@ -1,4 +1,5 @@
 #include "shuffle.h"
+#include <sys/stat.h>
 
 const wchar_t *help = L"---------------------------------------------------------------------\n"
                       "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
@@ -12,7 +13,10 @@ const wchar_t *help = L"--------------------------------------------------------
                       "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
                       "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n"
                       "         You can shuffle every kind of text file (with Unicode characters).\n\n"
-                      "License: MIT 2024 Lennart Martens https://github.com/lennart1978/shuffle\n";
+                      "         Now you can also use it with a pipe:\n"
+                      "         cat file.ascii | shuffle -s 100 -c random\n"
+                      "---------------------------------------------------------------------\n"
+                      "License: MIT 2025 Lennart Martens https://github.com/lennart1978/shuffle\n";
 
 // Handle SIGINT signal: Clean up & exit.
 static void handle_sigint(int sig)
@@ -60,11 +64,15 @@ int main(int argc, char *argv[])
     char *rgbColors = NULL;
     char *speed = NULL;
 
-    // Pointer to the shuffle function, maybe I'll add more effects...
+    // Pointer to the shuffle function
     void (*p_effect)(int *, int) = shuffle;
 
     // Register SIGINT signal
     signal(SIGINT, handle_sigint);
+
+    // Check if input is from a pipe
+    struct stat st;
+    int using_pipe = (fstat(STDIN_FILENO, &st) == 0 && S_ISFIFO(st.st_mode));
 
     while ((option = getopt(argc, argv, "hvs:c:")) >= 0)
     {
@@ -96,7 +104,7 @@ int main(int argc, char *argv[])
             }
             break;
         case '?':
-            wprintf(L"Wrong argumets: Type -h for help\n");
+            wprintf(L"Wrong arguments: Type -h for help\n");
             return EXIT_FAILURE;
         }
     }
@@ -107,9 +115,26 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (load_ascii(argv[optind]) != 0)
+    if (using_pipe)
     {
-        wprintf(L"Error loading ASCII file.\n");
+        if (load_ascii("-") != 0)
+        {
+            wprintf(L"Error loading input from pipe.\n");
+            return EXIT_FAILURE;
+        }
+    }
+    else if (optind < argc)
+    {
+        // Data comes from a file
+        if (load_ascii(argv[optind]) != 0)
+        {
+            wprintf(L"Error loading file %s.\n", argv[optind]);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        wprintf(L"No input provided. Type -h for help\n");
         return EXIT_FAILURE;
     }
 

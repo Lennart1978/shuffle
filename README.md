@@ -4,6 +4,10 @@ The shuffle command prints an ASCII art picture with a cool shuffle effect.
 
 You can also shuffle any text file, even if it contains Unicode characters.
 
+Now you can also use it with a pipe:  
+
+cat file.ascii | shuffle -s 100 -c random
+
 ## Usage
 
 shuffle SOURCE -s speed -c color  

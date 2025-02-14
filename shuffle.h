@@ -9,43 +9,63 @@
 #include <locale.h>
 #include <errno.h>
 #include <signal.h>
+#include <stdbool.h>
 
-#define HELP 1
-#define NO_HELP 0
+// Program version
+#define VERSION "1.3.1"
 
-#define VERSION "1.3.0"
+// Constants for program configuration
+#define MAX_SPEED 500
+#define MIN_SPEED 1
+#define BASE_NANOSECONDS 10000
+#define INITIAL_BUFFER_SIZE 1024
+#define DISPLAY_PAUSE_SECONDS 2
 
-// Nanoseconds multiplied with speed
-#define NSECONDS 10000
+// Color constants
+#define MAX_COLOR_VALUE 255
+#define DEFAULT_COLOR "white"
 
-// The last bit as flag
-#define IS_END_FLAG 0x01
+// Return codes
+#define SUCCESS 0
+#define ERROR_MEMORY -1
+#define ERROR_FILE -2
+#define ERROR_INPUT -3
 
-// Dimension of the ASCII picture
-extern int width, height;
+// Function types
+typedef void (*shuffle_func)(int *, size_t);
 
-// Structure for 'nanosleep' function
-extern struct timespec req;
-
-// Allocated memory for the ASCII picture
-extern wchar_t *ascii_pic;
-
-void shuffle(int *array, int n);
-int load_ascii(const char *filename);
-int is_valid_color(const char *color);
-
-// 'p_effect' is a pointer to a function for the effect.
-int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int speed, char *rgb, int is_help);
-
-// (inline Assembly test: not necessary)
-static inline void swap(int *a, int *b)
+// Structure for program configuration
+typedef struct
 {
-    __asm__(
-        "movl (%0), %%eax;\n"
-        "movl (%1), %%ebx;\n"
-        "movl %%ebx, (%0);\n"
-        "movl %%eax, (%1);"
-        :
-        : "r"(a), "r"(b)
-        : "%eax", "%ebx");
+    int width;
+    int height;
+    int speed;
+    char *color;
+    bool is_help;
+    const wchar_t *input_text;
+} ShuffleConfig;
+
+// Structure for color
+typedef struct
+{
+    int r;
+    int g;
+    int b;
+    bool is_random;
+} Color;
+
+// Function declarations
+void shuffle_array(int *array, size_t n);
+int load_ascii(const char *filename, wchar_t **output);
+bool is_valid_color(const char *color);
+int show_shuffled(const ShuffleConfig *config);
+Color parse_color(const char *color_str);
+void cleanup_resources(void);
+
+// Inline functions
+static inline void swap_ints(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }

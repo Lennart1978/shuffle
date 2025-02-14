@@ -1,267 +1,310 @@
 #include "shuffle.h"
 
-int width, height;
-wchar_t *ascii_pic;
-struct timespec req;
+static wchar_t *ascii_pic = NULL;
+static struct timespec sleep_time = {0, 0};
 
-// The Fischer - Yates shuffle algorithm
-void shuffle(int *array, int n)
+void cleanup_resources(void)
 {
-    srand((unsigned int)time(NULL));
-    for (int i = n - 1; i > 0; i--)
+    free(ascii_pic);
+    ascii_pic = NULL;
+    wprintf(L"\033[?25h"); // Show cursor
+    wprintf(L"\033[0m");   // Reset text mode
+}
+
+void shuffle_array(int *array, size_t n)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    srand((unsigned int)ts.tv_nsec); // Better randomization using nanoseconds
+
+    for (size_t i = n - 1; i > 0; i--)
     {
-        int j = rand() % (i + 1);
-        swap(&array[i], &array[j]);
+        size_t j = rand() % (i + 1);
+        swap_ints(&array[i], &array[j]);
     }
 }
 
-int show_shuffled(void (*p_effect)(int *, int), const wchar_t *ansi_pic, int speed, char *rgb, int is_help)
+Color parse_color(const char *color_str)
 {
-    // The wait time between each printed char is:  speed * 10000 nanoseconds
-    req.tv_nsec = speed * NSECONDS;
-    req.tv_sec = 0;
-    int shuffle_index = 0, shuffled_row = 0, shuffled_col = 0, row = 0, col = 0, total_pixels = 0, max_length = 0;
-    wchar_t c;
-    int flag = 0;
+    Color color = {0, 0, 0, false};
 
-    // Pointer to the loaded string
-    const wchar_t *textfile;
-    textfile = ansi_pic;
-
-    // Get 2D dimension of the text file (x = max_length, y = rows)
-    while ((c = *textfile++) != L'\0')
+    if (strcmp(color_str, "random") == 0)
     {
-        if (c == L'\n')
+        color.is_random = true;
+        return color;
+    }
+
+    // Standard colors
+    static const struct
+    {
+        const char *name;
+        Color color;
+    } standard_colors[] = {
+        {"red", {255, 0, 0, false}},
+        {"green", {0, 255, 0, false}},
+        {"yellow", {255, 255, 0, false}},
+        {"blue", {0, 0, 255, false}},
+        {"magenta", {255, 0, 255, false}},
+        {"cyan", {0, 255, 255, false}},
+        {"white", {255, 255, 255, false}},
+        {"black", {0, 0, 0, false}},
+        {"orange", {255, 165, 0, false}},
+        {"grey", {127, 127, 127, false}},
+    };
+
+    // Check standard colors
+    for (size_t i = 0; i < sizeof(standard_colors) / sizeof(standard_colors[0]); i++)
+    {
+        if (strcmp(color_str, standard_colors[i].name) == 0)
         {
-            row++;
-            max_length = col > max_length ? col : max_length;
-            col = -1;
+            return standard_colors[i].color;
         }
-        col++;
     }
 
-    // Reset pointer
-    textfile = ansi_pic;
-
-    // Create 2D text array
-    wchar_t **pic_array = calloc((row + 1), sizeof(wchar_t *));
-
-    for (int i = 0; i < row + 1; i++)
-    {
-        pic_array[i] = calloc(max_length + 1, sizeof(wchar_t));
-    }
-
-    if (pic_array == NULL)
-    {
-        wprintf(L"Can't allocate memory for 'pic_array'.\n");
-
-        return EXIT_FAILURE;
-    }
-
-    width = max_length;
-    height = row;
-
-    total_pixels = height * width;
-
-    row = col = 0;
-
-    /*Fill shorter rows with blank spaces and replace tabs with blank space.
-     *Store everything in 2D array */
-    while ((c = *textfile++) != L'\0')
-    {
-        pic_array[row][col] = c;
-        if (c == '\n')
-        {
-            if (col < max_length - 1)
-            {
-                for (c = L' '; col < max_length; pic_array[row][col++] = c)
-                    ;
-            }
-            col = -1;
-            row++;
-        }
-        else if (c == L'\t')
-        {
-            pic_array[row][col] = L' ';
-        }
-        col++;
-    }
-
-    // Delete screen and go to position 1, 1
-    wprintf(L"\033[2J\033[1;1H");
-
-    int *shuffle_array = calloc((long unsigned int)total_pixels, sizeof(int));
-
-    // Fill the shuffle array with ascending numbers.
-    for (int i = 0; i < total_pixels; i++)
-    {
-        shuffle_array[i] = i;
-    }
-
-    // Shuffle all the numbers in the array
-    p_effect(shuffle_array, total_pixels);
-
+    // Parse RGB format
     int r, g, b;
-
-    if (!strcmp(rgb, "random")) // Print with random RGB color
+    if (sscanf(color_str, "%d;%d;%d", &r, &g, &b) == 3)
     {
-        srand((unsigned int)time(NULL));
-        r = rand() % 255;
-        g = rand() % 255;
-        b = rand() % 255;
-    }
-    else if (!strcmp(rgb, "red"))
-        r = 255, g = 0, b = 0;
-    else if (!strcmp(rgb, "green"))
-        r = 0, g = 255, b = 0;
-    else if (!strcmp(rgb, "yellow"))
-        r = 255, g = 255, b = 0;
-    else if (!strcmp(rgb, "blue"))
-        r = 0, g = 0, b = 255;
-    else if (!strcmp(rgb, "magenta"))
-        r = 255, g = 0, b = 255;
-    else if (!strcmp(rgb, "cyan"))
-        r = 0, g = 255, b = 255;
-    else if (!strcmp(rgb, "white"))
-        r = 255, g = 255, b = 255;
-    else if (!strcmp(rgb, "black"))
-        r = 0, g = 0, b = 0;
-    else if (!strcmp(rgb, "orange"))
-        r = 255, g = 165, b = 0;
-    else if (!strcmp(rgb, "grey"))
-        r = 127, g = 127, b = 127;
-    else
-    {
-        wprintf(L"\033[38;2;%sm", rgb); // Print with given RGB values
-        goto jump;
-    }
-
-    wprintf(L"\033[38;2;%d;%d;%dm", r, g, b); // Print with one of the 'standard' colors
-
-jump:
-
-    // Hide the cursor
-    wprintf(L"\033[?25l");
-
-    // Show and delete the ASCII picture with amazing shuffle effect
-    for (int p = 0; p < (is_help ? 1 : 2); p++)
-    {
-        for (int i = 0; i < total_pixels; i++)
+        if (r >= 0 && r <= MAX_COLOR_VALUE &&
+            g >= 0 && g <= MAX_COLOR_VALUE &&
+            b >= 0 && b <= MAX_COLOR_VALUE)
         {
-            shuffle_index = shuffle_array[i];
-            shuffled_row = shuffle_index / width;
-            shuffled_col = shuffle_index % width;
-
-            // Move Cursor to shuffled position
-            wprintf(L"\033[%d;%dH", shuffled_row + 1, shuffled_col + 1);
-            // Print char at shuffled position
-            wprintf(L"%lc", pic_array[shuffled_row][shuffled_col]);
-            // Wait some nanoseconds after every char
-            nanosleep(&req, NULL);
-            fflush(stdout);
-        }
-
-        // Show the ASCII art for 2 seconds at first glance (with bit flag)
-        ((!(flag & IS_END_FLAG)) && !is_help) ? sleep(2), flag |= IS_END_FLAG : 0;
-
-        if (!is_help)
-        {
-            // Shuffle the array again for deletion effect
-            p_effect(shuffle_array, total_pixels);
-
-            // Delete the 2D array (Fill with blank spaces)
-            for (int r2 = 0; r2 < height; r2++)
-            {
-                for (int q = 0; q < width; pic_array[r2][q++] = L' ')
-                    ;
-            }
+            color.r = r;
+            color.g = g;
+            color.b = b;
         }
     }
 
-    // Show the cursor again
-    wprintf(L"\033[?25h");
-
-    // Reset text mode
-    wprintf(L"\033[0m");
-
-    // Delete screen and go to position 1, 1 (only if not showing help)
-    !is_help ? wprintf(L"0\33[2J\033[1;1H") : wprintf(L"\033[22;1H");
-
-    // free the allocated memory
-    for (int i = 0; i < row + 1; i++)
-    {
-        free(pic_array[i]);
-    }
-
-    free(pic_array);
-
-    free(shuffle_array);
-
-    return EXIT_SUCCESS;
+    return color;
 }
 
-int load_ascii(const char *filename)
+bool is_valid_color(const char *color)
 {
-    wint_t wc;
+    Color c = parse_color(color);
+    return c.is_random || (c.r >= 0 && c.g >= 0 && c.b >= 0);
+}
+
+int load_ascii(const char *filename, wchar_t **output)
+{
+    if (!filename || !output)
+    {
+        return ERROR_INPUT;
+    }
+
+    FILE *input_stream = strcmp(filename, "-") == 0 ? stdin : fopen(filename, "r");
+    if (!input_stream)
+    {
+        wprintf(L"Cannot open input file: %s\n", strerror(errno));
+        return ERROR_FILE;
+    }
+
+    size_t buffer_size = INITIAL_BUFFER_SIZE;
     size_t read_chars = 0;
-    size_t buffer_size = 1024;
-    FILE *input_stream;
+    wchar_t *buffer = calloc(buffer_size, sizeof(wchar_t));
 
-    if (strcmp(filename, "-") == 0)
+    if (!buffer)
     {
-        input_stream = stdin;
-    }
-    else
-    {
-        input_stream = fopen(filename, "r");
-        if (!input_stream)
-        {
-            wprintf(L"Can't open input file: %s\n", strerror(errno));
-            return EXIT_FAILURE;
-        }
+        if (input_stream != stdin)
+            fclose(input_stream);
+        return ERROR_MEMORY;
     }
 
-    if (!filename)
-    {
-        wprintf(L"Invalid input filename\n");
-        return EXIT_FAILURE;
-    }
-
-    ascii_pic = calloc(buffer_size, sizeof(wchar_t));
-
-    if (!ascii_pic)
-    {
-        wprintf(L"Can't allocate memory for 'ascii_pic'\n");
-        return EXIT_FAILURE;
-    }
-
+    wint_t wc;
     while ((wc = fgetwc(input_stream)) != WEOF)
     {
         if (read_chars >= buffer_size - 1)
         {
             buffer_size *= 2;
-            wchar_t *new_buffer = realloc(ascii_pic, buffer_size * sizeof(wchar_t));
+            wchar_t *new_buffer = realloc(buffer, buffer_size * sizeof(wchar_t));
             if (!new_buffer)
             {
-                wprintf(L"Memory reallocation failed\n");
-                free(ascii_pic);
-                return EXIT_FAILURE;
+                free(buffer);
+                if (input_stream != stdin)
+                    fclose(input_stream);
+                return ERROR_MEMORY;
             }
-            ascii_pic = new_buffer;
+            buffer = new_buffer;
         }
-        ascii_pic[read_chars++] = (wchar_t)wc;
+        buffer[read_chars++] = (wchar_t)wc;
     }
 
     if (ferror(input_stream))
     {
-        wprintf(L"Error reading input: %s\n", strerror(errno));
-        free(ascii_pic);
-        return EXIT_FAILURE;
+        free(buffer);
+        if (input_stream != stdin)
+            fclose(input_stream);
+        return ERROR_FILE;
     }
 
-    ascii_pic[read_chars] = L'\0';
-    if (input_stream != stdin)
-        fclose(input_stream);
+    buffer[read_chars] = L'\0';
+    *output = buffer;
 
-    return EXIT_SUCCESS;
+    if (input_stream != stdin)
+    {
+        fclose(input_stream);
+    }
+
+    return SUCCESS;
+}
+
+int show_shuffled(const ShuffleConfig *config)
+{
+    if (!config || !config->input_text)
+    {
+        return ERROR_INPUT;
+    }
+
+    sleep_time.tv_nsec = config->speed * BASE_NANOSECONDS;
+    sleep_time.tv_sec = 0;
+
+    // Calculate dimensions
+    int max_length = 0;
+    int current_row = 0;
+    int current_col = 0;
+    const wchar_t *text_ptr = config->input_text;
+
+    while (*text_ptr)
+    {
+        if (*text_ptr == L'\n')
+        {
+            max_length = current_col > max_length ? current_col : max_length;
+            current_row++;
+            current_col = 0;
+        }
+        else
+        {
+            current_col++;
+        }
+        text_ptr++;
+    }
+
+    int width = max_length;
+    int height = current_row + 1;
+    int total_pixels = height * width;
+
+    // Allocate and initialize 2D array
+    wchar_t **pic_array = calloc(height, sizeof(wchar_t *));
+    if (!pic_array)
+    {
+        return ERROR_MEMORY;
+    }
+
+    for (int i = 0; i < height; i++)
+    {
+        pic_array[i] = calloc(width, sizeof(wchar_t));
+        if (!pic_array[i])
+        {
+            for (int j = 0; j < i; j++)
+            {
+                free(pic_array[j]);
+            }
+            free(pic_array);
+            return ERROR_MEMORY;
+        }
+        // Initialize with spaces
+        wmemset(pic_array[i], L' ', width);
+    }
+
+    // Fill array with content
+    text_ptr = config->input_text;
+    current_row = current_col = 0;
+
+    while (*text_ptr)
+    {
+        if (*text_ptr == L'\n')
+        {
+            current_row++;
+            current_col = 0;
+        }
+        else if (*text_ptr == L'\t')
+        {
+            pic_array[current_row][current_col++] = L' ';
+        }
+        else
+        {
+            pic_array[current_row][current_col++] = *text_ptr;
+        }
+        text_ptr++;
+    }
+
+    // Clear screen and hide cursor
+    wprintf(L"\033[2J\033[1;1H\033[?25l");
+
+    // Initialize shuffle array
+    int *indices = calloc(total_pixels, sizeof(int));
+    if (!indices)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            free(pic_array[i]);
+        }
+        free(pic_array);
+        return ERROR_MEMORY;
+    }
+
+    for (int i = 0; i < total_pixels; i++)
+    {
+        indices[i] = i;
+    }
+
+    // Set color
+    Color color = parse_color(config->color);
+    if (color.is_random)
+    {
+        color.r = rand() % (MAX_COLOR_VALUE + 1);
+        color.g = rand() % (MAX_COLOR_VALUE + 1);
+        color.b = rand() % (MAX_COLOR_VALUE + 1);
+    }
+    wprintf(L"\033[38;2;%d;%d;%dm", color.r, color.g, color.b);
+
+    // Display loop
+    for (int pass = 0; pass < (config->is_help ? 1 : 2); pass++)
+    {
+        shuffle_array(indices, total_pixels);
+
+        for (int i = 0; i < total_pixels; i++)
+        {
+            int idx = indices[i];
+            int row = idx / width;
+            int col = idx % width;
+
+            wprintf(L"\033[%d;%dH%lc", row + 1, col + 1,
+                    pic_array[row][col]);
+
+            nanosleep(&sleep_time, NULL);
+            fflush(stdout);
+        }
+
+        if (!config->is_help && pass == 0)
+        {
+            sleep(DISPLAY_PAUSE_SECONDS);
+
+            // Clear for second pass
+            for (int r = 0; r < height; r++)
+            {
+                wmemset(pic_array[r], L' ', width);
+            }
+        }
+    }
+
+    // Cleanup
+    for (int i = 0; i < height; i++)
+    {
+        free(pic_array[i]);
+    }
+    free(pic_array);
+    free(indices);
+
+    if (!config->is_help)
+    {
+        wprintf(L"\033[2J\033[1;1H");
+    }
+    else
+    {
+        wprintf(L"\033[%d;1H", height + 1);
+    }
+
+    wprintf(L"\033[?25h\033[0m");
+
+    return SUCCESS;
 }

@@ -1,136 +1,130 @@
 #include "shuffle.h"
 #include <sys/stat.h>
+#include <getopt.h>
 
-const wchar_t *help = L"---------------------------------------------------------------------\n"
-                      "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
-                      "--------------------------V.:" VERSION "-----------------------------------\n"
-                      "Usage:\nshuffle SOURCE -s speed -c color\n\n"
-                      "-s  speed: from 1 fast to 500 very slow.\n"
-                      "-c  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
-                      "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
-                      "-h  show this help\n"
-                      "-v  show version\n\n"
-                      "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
-                      "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n"
-                      "         You can shuffle every kind of text file (with Unicode characters).\n\n"
-                      "         Now you can also use it with a pipe:\n"
-                      "         cat file.ascii | shuffle -s 100 -c random\n"
-                      "---------------------------------------------------------------------\n"
-                      "License: MIT 2025 Lennart Martens https://github.com/lennart1978/shuffle\n";
+static const wchar_t *HELP_TEXT = L"---------------------------------------------------------------------\n"
+                                  "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
+                                  "--------------------------V.:" VERSION "-----------------------------------\n"
+                                  "Usage:\nshuffle SOURCE -s speed -c color\n\n"
+                                  "-s  speed: from 1 fast to 500 very slow.\n"
+                                  "-c  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
+                                  "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
+                                  "-h  show this help\n"
+                                  "-v  show version\n\n"
+                                  "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
+                                  "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n"
+                                  "         You can shuffle every kind of text file (with Unicode characters).\n\n"
+                                  "         Now you can also use it with a pipe:\n"
+                                  "         cat file.ascii | shuffle -s 100 -c random\n"
+                                  "---------------------------------------------------------------------\n"
+                                  "License: MIT 2025 Lennart Martens https://github.com/lennart1978/shuffle\n";
 
-// Handle SIGINT signal: Clean up & exit.
-static void handle_sigint(int sig)
+// Signal handler for cleanup
+static void handle_interrupt(int sig)
 {
-    wprintf(L"\033[2J\033[1;1H");
-
-    wprintf(L"\033[?25h");
-
-    wprintf(L"\nSIGINT: %d Clean up and exit.\n", sig);
-
-    if (ascii_pic)
-        free(ascii_pic);
-
-    exit(0);
+    (void)sig; // Unused parameter
+    wprintf(L"\033[2J\033[1;1H\033[?25h");
+    cleanup_resources();
+    exit(EXIT_SUCCESS);
 }
 
-int is_valid_color(const char *color)
+static void show_help(void)
 {
-    // Check if it's a standard color
-    if (!strcmp(color, "red") || !strcmp(color, "green") || !strcmp(color, "yellow") ||
-        !strcmp(color, "blue") || !strcmp(color, "magenta") || !strcmp(color, "cyan") ||
-        !strcmp(color, "orange") || !strcmp(color, "white") || !strcmp(color, "black") ||
-        !strcmp(color, "grey") || !strcmp(color, "random"))
+    ShuffleConfig config = {
+        .speed = 50,
+        .color = "white",
+        .is_help = true,
+        .input_text = HELP_TEXT};
+    show_shuffled(&config);
+}
+
+static bool is_pipe_input(void)
+{
+    struct stat st;
+    return (fstat(STDIN_FILENO, &st) == 0 && S_ISFIFO(st.st_mode));
+}
+
+static bool validate_speed(const char *speed_str, int *speed_val)
+{
+    char *endptr;
+    long speed = strtol(speed_str, &endptr, 10);
+
+    if (*endptr != '\0' || speed < MIN_SPEED || speed > MAX_SPEED)
     {
-        return 1;
+        wprintf(L"Invalid speed value. Must be between %d and %d.\n",
+                MIN_SPEED, MAX_SPEED);
+        return false;
     }
 
-    // Check if it's in the "r;g;b" format
-    int r, g, b;
-    if (sscanf(color, "%d;%d;%d", &r, &g, &b) == 3)
-    {
-        if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
-        {
-            return 1;
-        }
-    }
-
-    return 0;
+    *speed_val = (int)speed;
+    return true;
 }
 
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
-    int option = 0;
-    char *rgbColors = NULL;
-    char *speed = NULL;
+    signal(SIGINT, handle_interrupt);
 
-    // Pointer to the shuffle function
-    void (*p_effect)(int *, int) = shuffle;
+    int option;
+    char *color_arg = NULL;
+    char *speed_str = NULL;
+    int speed_val = 0;
+    bool using_pipe = is_pipe_input();
 
-    // Register SIGINT signal
-    signal(SIGINT, handle_sigint);
-
-    // Check if input is from a pipe
-    struct stat st;
-    int using_pipe = (fstat(STDIN_FILENO, &st) == 0 && S_ISFIFO(st.st_mode));
-
-    while ((option = getopt(argc, argv, "hvs:c:")) >= 0)
+    // Parse command line options
+    while ((option = getopt(argc, argv, "hvs:c:")) != -1)
     {
         switch (option)
         {
         case 'h':
-            show_shuffled(p_effect, help, 50, "white", HELP);
+            show_help();
             return EXIT_SUCCESS;
+
         case 'v':
-            wprintf(L"Version:" VERSION "\n");
+            wprintf(L"Version: " VERSION "\n");
             return EXIT_SUCCESS;
+
         case 's':
-            speed = optarg;
-            // Check if speed is a valid integer and within the allowed range
-            int speed_val = atoi(speed);
-            if (speed_val <= 0 || speed_val > 500)
+            speed_str = optarg;
+            if (!validate_speed(speed_str, &speed_val))
             {
-                wprintf(L"Invalid speed value. Must be between 1 and 500.\n");
                 return EXIT_FAILURE;
             }
             break;
+
         case 'c':
-            rgbColors = optarg;
-            // Check if rgbColors is a valid color format
-            if (!is_valid_color(rgbColors))
+            color_arg = optarg;
+            if (!is_valid_color(color_arg))
             {
                 wprintf(L"Invalid color format. Must be \"r;g;b\" or a standard color.\n");
                 return EXIT_FAILURE;
             }
             break;
-        case '?':
+
+        default:
             wprintf(L"Wrong arguments: Type -h for help\n");
             return EXIT_FAILURE;
         }
     }
 
-    if (!rgbColors || !speed)
+    // Validate required arguments
+    if (!color_arg || !speed_str)
     {
-        wprintf(L"Type -h for help\n");
+        wprintf(L"Missing required arguments. Type -h for help\n");
         return EXIT_FAILURE;
     }
 
+    // Load ASCII content
+    wchar_t *content = NULL;
+    int load_result;
+
     if (using_pipe)
     {
-        if (load_ascii("-") != 0)
-        {
-            wprintf(L"Error loading input from pipe.\n");
-            return EXIT_FAILURE;
-        }
+        load_result = load_ascii("-", &content);
     }
     else if (optind < argc)
     {
-        // Data comes from a file
-        if (load_ascii(argv[optind]) != 0)
-        {
-            wprintf(L"Error loading file %s.\n", argv[optind]);
-            return EXIT_FAILURE;
-        }
+        load_result = load_ascii(argv[optind], &content);
     }
     else
     {
@@ -138,14 +132,29 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (show_shuffled(p_effect, ascii_pic, atoi(speed), rgbColors, NO_HELP) != 0)
+    if (load_result != SUCCESS)
     {
-        wprintf(L"Error shuffling ASCII picture.\n");
-        free(ascii_pic);
+        wprintf(L"Error loading input: %d\n", load_result);
         return EXIT_FAILURE;
     }
 
-    free(ascii_pic);
+    // Configure and run shuffle
+    ShuffleConfig config = {
+        .speed = speed_val,
+        .color = color_arg,
+        .is_help = false,
+        .input_text = content};
+
+    int result = show_shuffled(&config);
+
+    // Cleanup
+    free(content);
+
+    if (result != SUCCESS)
+    {
+        wprintf(L"Error during shuffle operation: %d\n", result);
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

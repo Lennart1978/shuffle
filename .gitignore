@@ -6,3 +6,4 @@ build
 update-version.sh
 shuffle
 *.o
+merged.txt

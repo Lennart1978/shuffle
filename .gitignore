@@ -7,3 +7,5 @@ update-version.sh
 shuffle
 *.o
 merged.txt
+merged.ansi
+.gitignore

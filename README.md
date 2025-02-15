@@ -62,3 +62,6 @@ For Arch Linux users: It is now available in the AUR as 'shuffle-ascii'.
 
 ![Shuffle animation](shuffle.gif)
 ![By the way animation](bytheway.gif)
+The complete code merged:
+![Code merged svg](merged.svg)
+

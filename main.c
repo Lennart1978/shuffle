@@ -17,11 +17,11 @@ static const wchar_t *HELP_TEXT = L"--------------------------------------------
                                   "    blocks - Random blocks\n"
                                   "-h  show this help\n"
                                   "-v  show version\n\n"
-                                  "Example: shuffle file.ascii -s 10 -c \"50;255;50\" -e spiral  prints file.ascii in bright green with spiral effect.\n"
+                                  "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green with random shuffle effect.\n"
                                   "         shuffle file.ascii -s 50 -c yellow -e blocks  prints it in yellow with blocks effect.\n"
                                   "         You can shuffle every kind of text file (with Unicode characters).\n\n"
                                   "         Now you can also use it with a pipe:\n"
-                                  "         cat file.ascii | shuffle -s 100 -c random -e wipe\n"
+                                  "         cat file.ascii | shuffle -s 100 -c random\n"
                                   "---------------------------------------------------------------------\n"
                                   "License: MIT 2025 Lennart Martens https://github.com/lennart1978/shuffle\n";
 

@@ -10,11 +10,13 @@ cat file.ascii | shuffle -s 100 -c random
 
 ## Usage
 
-shuffle SOURCE -s speed -c color  
+shuffle SOURCE -s speed -c color -e effect
 
 -s speed: 1 fast to 500 very slow.
 
 -c color: Must be in the format "r;g;b" or one of the standard colors: red, green, yellow, blue, magenta, cyan, orange, white, black, grey, or just "random".
+
+-e effect: Random(standard), spiral, wipe, snake, blocks
 
 -h show this help.
 
@@ -24,11 +26,11 @@ shuffle SOURCE -s speed -c color
 
 shuffle file.ascii -s 10 -c "50;255;50"  
 
-prints file.ascii in bright green.
+prints file.ascii in bright green with random shuffle effect.
 
-shuffle file.ascii -s 50 -c orange  
+shuffle file.ascii -s 50 -c orange -e wipe
 
-prints it with the standard color (orange).
+prints it with the standard color (orange) with "wipe" effect.
 
 ## Build with Meson or Make
 
@@ -62,6 +64,3 @@ For Arch Linux users: It is now available in the AUR as 'shuffle-ascii'.
 
 ![Shuffle animation](shuffle.gif)
 ![By the way animation](bytheway.gif)
-The complete code merged:
-![Code merged svg](merged.svg)
-

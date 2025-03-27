@@ -5,17 +5,23 @@
 static const wchar_t *HELP_TEXT = L"---------------------------------------------------------------------\n"
                                   "shuffle: This command prints an ASCII art picture with shuffle effect.\n"
                                   "--------------------------V.:" VERSION "-----------------------------------\n"
-                                  "Usage:\nshuffle SOURCE -s speed -c color\n\n"
+                                  "Usage:\nshuffle SOURCE -s speed -c color [-e effect]\n\n"
                                   "-s  speed: from 1 fast to 500 very slow.\n"
                                   "-c  color: Must be in format: \"r;g;b\" or one of the standard colors:\n"
                                   "    red, green, yellow, blue, magenta, cyan, orange, white, black, grey or just random.\n"
+                                  "-e  effect: Animation effect (default: random):\n"
+                                  "    random - Standard random shuffle\n"
+                                  "    spiral - Spiral from center\n"
+                                  "    wipe - Left to right wipe\n"
+                                  "    snake - Snake-like pattern\n"
+                                  "    blocks - Random blocks\n"
                                   "-h  show this help\n"
                                   "-v  show version\n\n"
-                                  "Example: shuffle file.ascii -s 10 -c \"50;255;50\"  prints file.ascii in bright green.\n"
-                                  "         shuffle file.ascii -s 50 -c yellow  prints it in standard color (yellow).\n"
+                                  "Example: shuffle file.ascii -s 10 -c \"50;255;50\" -e spiral  prints file.ascii in bright green with spiral effect.\n"
+                                  "         shuffle file.ascii -s 50 -c yellow -e blocks  prints it in yellow with blocks effect.\n"
                                   "         You can shuffle every kind of text file (with Unicode characters).\n\n"
                                   "         Now you can also use it with a pipe:\n"
-                                  "         cat file.ascii | shuffle -s 100 -c random\n"
+                                  "         cat file.ascii | shuffle -s 100 -c random -e wipe\n"
                                   "---------------------------------------------------------------------\n"
                                   "License: MIT 2025 Lennart Martens https://github.com/lennart1978/shuffle\n";
 
@@ -34,7 +40,8 @@ static void show_help(void)
         .speed = 50,
         .color = "white",
         .is_help = true,
-        .input_text = HELP_TEXT};
+        .input_text = HELP_TEXT,
+        .effect = EFFECT_RANDOM};
     show_shuffled(&config);
 }
 
@@ -68,11 +75,13 @@ int main(int argc, char *argv[])
     int option;
     char *color_arg = NULL;
     char *speed_str = NULL;
+    char *effect_str = NULL;
     int speed_val = 0;
+    ShuffleEffect effect_val = EFFECT_RANDOM;
     bool using_pipe = is_pipe_input();
 
     // Parse command line options
-    while ((option = getopt(argc, argv, "hvs:c:")) != -1)
+    while ((option = getopt(argc, argv, "hvs:c:e:")) != -1)
     {
         switch (option)
         {
@@ -99,6 +108,16 @@ int main(int argc, char *argv[])
                 wprintf(L"Invalid color format. Must be \"r;g;b\" or a standard color.\n");
                 return EXIT_FAILURE;
             }
+            break;
+
+        case 'e':
+            effect_str = optarg;
+            if (!is_valid_effect(effect_str))
+            {
+                wprintf(L"Invalid effect. Must be one of: random, spiral, wipe, snake, blocks.\n");
+                return EXIT_FAILURE;
+            }
+            effect_val = parse_effect(effect_str);
             break;
 
         default:
@@ -143,7 +162,8 @@ int main(int argc, char *argv[])
         .speed = speed_val,
         .color = color_arg,
         .is_help = false,
-        .input_text = content};
+        .input_text = content,
+        .effect = effect_val};
 
     int result = show_shuffled(&config);
 

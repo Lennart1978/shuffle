@@ -147,6 +147,252 @@ int load_ascii(const char *filename, wchar_t **output)
     return SUCCESS;
 }
 
+// New functions for shuffle effects
+void generate_effect_indices(int *indices, int width, int height, ShuffleEffect effect)
+{
+    int total_pixels = width * height;
+
+    // Initialize all indices sequentially
+    for (int i = 0; i < total_pixels; i++)
+    {
+        indices[i] = i;
+    }
+
+    switch (effect)
+    {
+    case EFFECT_RANDOM:
+        // Normal random shuffling
+        shuffle_array(indices, total_pixels);
+        break;
+
+    case EFFECT_SPIRAL:
+    {
+        // Spiral effect from center
+        int center_x = width / 2;
+        int center_y = height / 2;
+        int idx = 0;
+
+        // Each point gets an index based on its distance from the center
+        for (int radius = 0; radius <= width + height; radius++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int dx = abs(x - center_x);
+                    int dy = abs(y - center_y);
+                    int dist = dx + dy;
+
+                    if (dist == radius)
+                    {
+                        indices[idx++] = y * width + x;
+                    }
+                }
+            }
+        }
+
+        // Randomize within each radius
+        for (int r = 0; r <= width + height; r++)
+        {
+            int start_idx = 0;
+            int count = 0;
+
+            // Count how many points have this radius
+            for (int i = 0; i < total_pixels; i++)
+            {
+                int x = indices[i] % width;
+                int y = indices[i] / width;
+                int dx = abs(x - center_x);
+                int dy = abs(y - center_y);
+
+                if (dx + dy == r)
+                {
+                    if (count == 0)
+                        start_idx = i;
+                    count++;
+                }
+            }
+
+            // Shuffle within this radius
+            if (count > 1)
+            {
+                shuffle_array(indices + start_idx, count);
+            }
+        }
+    }
+    break;
+
+    case EFFECT_WIPE:
+    {
+        // Wipe effect from left to right
+        int idx = 0;
+
+        // Sort indices by x-coordinate (from left to right)
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                indices[idx++] = y * width + x;
+            }
+        }
+
+        // Add some randomness within each column
+        for (int x = 0; x < width; x++)
+        {
+            shuffle_array(indices + x * height, height);
+        }
+    }
+    break;
+
+    case EFFECT_SNAKE:
+    {
+        // Snake effect (zig-zag through the screen)
+        int idx = 0;
+
+        for (int y = 0; y < height; y++)
+        {
+            if (y % 2 == 0)
+            {
+                // Even rows from left to right
+                for (int x = 0; x < width; x++)
+                {
+                    indices[idx++] = y * width + x;
+                }
+            }
+            else
+            {
+                // Odd rows from right to left
+                for (int x = width - 1; x >= 0; x--)
+                {
+                    indices[idx++] = y * width + x;
+                }
+            }
+        }
+
+        // Slight variation in each row
+        for (int y = 0; y < height; y++)
+        {
+            int start = y * width;
+            int len = width;
+
+            // Shuffle each row slightly
+            for (int i = 0; i < len / 3; i++)
+            {
+                int idx1 = start + rand() % len;
+                int idx2 = start + rand() % len;
+                swap_ints(&indices[idx1], &indices[idx2]);
+            }
+        }
+    }
+    break;
+
+    case EFFECT_BLOCKS:
+    {
+        // Block-wise appearance (in random blocks)
+        const int block_size = 3; // Size of blocks
+
+        // Create a list of blocks
+        int blocks_x = (width + block_size - 1) / block_size;
+        int blocks_y = (height + block_size - 1) / block_size;
+        int total_blocks = blocks_x * blocks_y;
+        int *block_order = malloc(total_blocks * sizeof(int));
+
+        if (!block_order)
+        {
+            shuffle_array(indices, total_pixels); // Fallback
+            break;
+        }
+
+        // Initialize block order
+        for (int i = 0; i < total_blocks; i++)
+        {
+            block_order[i] = i;
+        }
+
+        // Shuffle the blocks
+        shuffle_array(block_order, total_blocks);
+
+        // Create the final index array, block by block
+        int idx = 0;
+        for (int b = 0; b < total_blocks; b++)
+        {
+            int block_idx = block_order[b];
+            int block_y = block_idx / blocks_x;
+            int block_x = block_idx % blocks_x;
+
+            // Within a block, all pixels in random order
+            int *block_pixels = malloc(block_size * block_size * sizeof(int));
+            if (!block_pixels)
+            {
+                free(block_order);
+                shuffle_array(indices, total_pixels); // Fallback
+                return;
+            }
+
+            int pixel_count = 0;
+            for (int y = 0; y < block_size; y++)
+            {
+                int real_y = block_y * block_size + y;
+                if (real_y >= height)
+                    continue;
+
+                for (int x = 0; x < block_size; x++)
+                {
+                    int real_x = block_x * block_size + x;
+                    if (real_x >= width)
+                        continue;
+
+                    block_pixels[pixel_count++] = real_y * width + real_x;
+                }
+            }
+
+            // Shuffle pixels within the block
+            shuffle_array(block_pixels, pixel_count);
+
+            // Add to the overall list
+            for (int i = 0; i < pixel_count; i++)
+            {
+                indices[idx++] = block_pixels[i];
+            }
+
+            free(block_pixels);
+        }
+
+        free(block_order);
+    }
+    break;
+    }
+}
+
+ShuffleEffect parse_effect(const char *effect_str)
+{
+    if (!effect_str)
+        return EFFECT_RANDOM;
+
+    if (strcmp(effect_str, "random") == 0)
+        return EFFECT_RANDOM;
+    if (strcmp(effect_str, "spiral") == 0)
+        return EFFECT_SPIRAL;
+    if (strcmp(effect_str, "wipe") == 0)
+        return EFFECT_WIPE;
+    if (strcmp(effect_str, "snake") == 0)
+        return EFFECT_SNAKE;
+    if (strcmp(effect_str, "blocks") == 0)
+        return EFFECT_BLOCKS;
+
+    // Fallback to the default effect
+    return EFFECT_RANDOM;
+}
+
+bool is_valid_effect(const char *effect)
+{
+    return strcmp(effect, "random") == 0 ||
+           strcmp(effect, "spiral") == 0 ||
+           strcmp(effect, "wipe") == 0 ||
+           strcmp(effect, "snake") == 0 ||
+           strcmp(effect, "blocks") == 0;
+}
+
 int show_shuffled(const ShuffleConfig *config)
 {
     if (!config || !config->input_text)
@@ -230,7 +476,7 @@ int show_shuffled(const ShuffleConfig *config)
     // Clear screen and hide cursor
     wprintf(L"\033[2J\033[1;1H\033[?25l");
 
-    // Initialize shuffle array
+    // Initialize indices array
     int *indices = calloc(total_pixels, sizeof(int));
     if (!indices)
     {
@@ -240,11 +486,6 @@ int show_shuffled(const ShuffleConfig *config)
         }
         free(pic_array);
         return ERROR_MEMORY;
-    }
-
-    for (int i = 0; i < total_pixels; i++)
-    {
-        indices[i] = i;
     }
 
     // Set color
@@ -260,7 +501,8 @@ int show_shuffled(const ShuffleConfig *config)
     // Display loop
     for (int pass = 0; pass < (config->is_help ? 1 : 2); pass++)
     {
-        shuffle_array(indices, total_pixels);
+        // Generate indices based on the selected effect
+        generate_effect_indices(indices, width, height, config->effect);
 
         for (int i = 0; i < total_pixels; i++)
         {

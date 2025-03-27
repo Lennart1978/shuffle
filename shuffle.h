@@ -12,7 +12,7 @@
 #include <stdbool.h>
 
 // Program version
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 
 // Constants for program configuration
 #define MAX_SPEED 500
@@ -31,6 +31,16 @@
 #define ERROR_FILE -2
 #define ERROR_INPUT -3
 
+// Shuffle effect types
+typedef enum
+{
+    EFFECT_RANDOM, // Standard random shuffle
+    EFFECT_SPIRAL, // Spiral from center
+    EFFECT_WIPE,   // Left to right wipe
+    EFFECT_SNAKE,  // Snake-like pattern
+    EFFECT_BLOCKS  // Random blocks
+} ShuffleEffect;
+
 // Function types
 typedef void (*shuffle_func)(int *, size_t);
 
@@ -43,6 +53,7 @@ typedef struct
     char *color;
     bool is_help;
     const wchar_t *input_text;
+    ShuffleEffect effect; // Added effect parameter
 } ShuffleConfig;
 
 // Structure for color
@@ -56,8 +67,11 @@ typedef struct
 
 // Function declarations
 void shuffle_array(int *array, size_t n);
+void generate_effect_indices(int *indices, int width, int height, ShuffleEffect effect);
 int load_ascii(const char *filename, wchar_t **output);
 bool is_valid_color(const char *color);
+bool is_valid_effect(const char *effect);
+ShuffleEffect parse_effect(const char *effect_str);
 int show_shuffled(const ShuffleConfig *config);
 Color parse_color(const char *color_str);
 void cleanup_resources(void);

@@ -1,7 +1,7 @@
 project(
     'shuffle',
     'c',
-    version: '1.3.1',
+    version: '1.3.2',
     default_options: ['warning_level=3', 'buildtype=release', 'c_std=c11'],
 )
 
